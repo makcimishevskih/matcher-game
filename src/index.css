@@ -28,3 +28,13 @@ ul,
 ol {
   list-style: none;
 }
+
+img {
+  display: block;
+  height: 100%;
+}
+
+button {
+  outline: none;
+  border: none;
+}

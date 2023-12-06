@@ -1,48 +1,63 @@
 import './App.css';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 
 import shuffle from '../helpers/shuffle';
 import cards from './config';
 
 import Card from './Card';
 import { Button } from '../shared/Button';
+import { useCallback } from 'react';
 
 const shuffled = shuffle(cards);
 
 function App() {
-  const [timer, setTimer] = useState(3);
+  const [timer, setTimer] = useState(0);
   const [cardsCount, setCardsCount] = useState(0);
-  const [shuffledCards, setShuffledCards] = useState(shuffled);
 
   const [pickedCards, setPickedCards] = useState([]);
-  const [IsGameFinished, setIsGameFinished] = useState(false);
+  const [shuffledCards, setShuffledCards] = useState([...shuffled]);
+
   const [isOff, setIsOff] = useState(false);
+  const [isStart, setIsStart] = useState(false);
+  const [IsGameFinished, setIsGameFinished] = useState(false);
 
   let timerId = useRef(null);
-
-  // useEffect(() => {
-  //   if (isStart && !timerId.current) {
-  //     timerId.current = setInterval(() => {
-  //       setTimer((prev) => {
-  //         if (prev === 0) handleStop();
-
-  //         return --prev;
-  //       });
-  //     }, 1000);
-  //   }
-
-  //   return () => clearInterval(timerId.current);
-  // }, [isStart]);
-  // const handleReset = () => {
-  //   setTimer(3);
-  //   setIsStart(false);
-  //   setcardsCount(0);
-  //   setPickedCards([]);
-  // };
+  let timerIdReset = useRef(null);
+  let timerIdOff = useRef(null);
 
   useEffect(() => {
-    let timerId;
+    if (isStart) {
+      timerId.current = setInterval(() => {
+        setTimer((prev) => (prev += 1));
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timerId.current);
+      clearInterval(timerIdReset.current);
+      clearInterval(timerIdOff.current);
+    };
+  }, [isStart]);
+
+  const handleReset = useCallback(() => {
+    const cur = timerId.current;
+    if (cur) clearInterval(cur);
+
+    setTimer(0);
+    setCardsCount(0);
+    setIsOff(false);
+    setIsStart(false);
+    setPickedCards([]);
+    timerIdReset.current = setTimeout(() => {
+      setShuffledCards((prev) =>
+        shuffle(prev.map((el) => ({ ...el, isSuccess: false, isError: false })))
+      );
+    }, 500);
+  }, [timerId]);
+
+  useEffect(() => {
+    let innderTimerId;
 
     if (!(cardsCount % 2) && cardsCount !== 0) {
       setIsOff(true);
@@ -61,52 +76,49 @@ function App() {
 
         if (cardsCount === cards.length) {
           setIsGameFinished(true);
-          console.log('shuffled');
+          clearInterval(timerId.current);
         }
       } else {
         setShuffledCards((prevArr) =>
           prevArr.map((el) => {
             if (el === prev || el === last) {
-              console.log(el === prev, el === last);
               el.isError = true;
             }
             return el;
           })
         );
 
-        timerId = setTimeout(() => {
+        innderTimerId = setTimeout(() => {
           setShuffledCards((prevArr) =>
             prevArr.map((el) => ({ ...el, isError: false }))
           );
 
           setPickedCards((prev) => prev.slice(0, prev.length - 2));
-
-          setCardsCount((prev) => (prev - 2 < 1 ? 0 : (prev -= 2)));
-        }, 700);
+          setCardsCount((prev) => (prev -= 2));
+        }, 400);
       }
-      setTimeout(() => {
+      timerIdOff.current = setTimeout(() => {
         setIsOff(false);
-      }, 710);
-
-      return () => clearTimeout(timerId);
+      }, 410);
     }
 
-    return () => clearTimeout(timerId);
+    return () => clearTimeout(innderTimerId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardsCount]);
 
-  const handleStart = () => {
-    console.log('start');
-  };
+  const handleStart = useCallback(() => {
+    setIsStart(true);
+  }, []);
 
-  const handleStop = () => {
-    const cur = timerId.current;
-    if (cur) {
-      clearInterval(cur);
-    }
-  };
+  const handleStop = useCallback(() => {
+    setIsStart(false);
+    handleReset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePick = (id) => {
     if (isOff) return;
+
     const card = shuffledCards.find((el) => el.id === id);
     if (pickedCards.find((el) => el.id === id)) return;
 
@@ -114,9 +126,18 @@ function App() {
     setCardsCount((prev) => (prev += 1));
   };
 
+  const result = useMemo(() => 1000 - timer * 10, [timer]);
+
   return (
     <div className="app">
-      {IsGameFinished && <div>YOU WIN!</div>}
+      {IsGameFinished && (
+        <div className="win-modal">
+          <div className="win-block">
+            <h2>you win!</h2>
+            <p>Your score is: {result < 0 ? 0 : result}</p>
+          </div>
+        </div>
+      )}
 
       <ul className="cards">
         {shuffledCards.map((el) => (
@@ -132,9 +153,12 @@ function App() {
       </ul>
 
       <div className="info">
-        <Button onClick={handleStart}>Start</Button>
-        <Button onClick={handleStop}>Stop</Button>
-        <div>Timer: {timer}seconds</div>
+        <Button onClick={handleStart}>start</Button>
+        <Button onClick={handleStop} variant="secondary">
+          stop
+        </Button>
+        <Button onClick={handleReset}>shuffle cards</Button>
+        <div>Timer: {timer} seconds</div>
         <div>Checked cards counter: {cardsCount}</div>
       </div>
     </div>

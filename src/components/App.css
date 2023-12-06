@@ -4,6 +4,7 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
+  position: relative;
 }
 
 .cards {
@@ -12,13 +13,28 @@
   grid-template-columns: repeat(4, 168px);
 }
 
-.btn {
-  display: inline-block;
-  margin: 5px 10px;
-  cursor: pointer;
-  padding: 15px 30px;
-  outline: none;
-  border: none;
-  background-color: cyan;
-  border-radius: 8px;
+.win-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+
+  width: 600px;
+  height: 400px;
+
+  font-size: 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: white;
+  background-color: rgba(255, 0, 0, 0.6);
+}
+
+.win-block {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
 }
