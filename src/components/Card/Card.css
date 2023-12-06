@@ -1,6 +1,7 @@
 .card {
   width: 168px;
   height: 168px;
+
   cursor: pointer;
   position: relative;
 }
@@ -9,6 +10,7 @@
 .card__back {
   width: 168px;
   height: 168px;
+
   overflow: hidden;
   backface-visibility: hidden;
   position: absolute;

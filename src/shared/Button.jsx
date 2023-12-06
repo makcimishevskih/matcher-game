@@ -2,7 +2,7 @@ import './Button.css';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-export const Button = ({ children, onClick, variant = 'primary' }) => {
+const Button = ({ children, onClick, variant = 'primary' }) => {
   const cxBtn = classNames('btn', variant);
 
   return (
@@ -11,6 +11,8 @@ export const Button = ({ children, onClick, variant = 'primary' }) => {
     </button>
   );
 };
+
+export default Button;
 
 Button.propTypes = {
   children: PropTypes.node,

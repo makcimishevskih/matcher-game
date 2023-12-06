@@ -1,15 +1,15 @@
 import './App.css';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
-import shuffle from '../helpers/shuffle';
 import cards from './config';
+import shuffle from '../helpers/shuffle';
 
+import Button from '../shared/Button';
 import Card from './Card';
-import { Button } from '../shared/Button';
-import { useCallback } from 'react';
+import Modal from './Modal';
 
-const shuffled = shuffle(cards);
+const shuffled = shuffle([...cards]);
 
 function App() {
   const [timer, setTimer] = useState(0);
@@ -19,8 +19,9 @@ function App() {
   const [shuffledCards, setShuffledCards] = useState([...shuffled]);
 
   const [isOff, setIsOff] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isStart, setIsStart] = useState(false);
-  const [IsGameFinished, setIsGameFinished] = useState(false);
+  const [isGameFinished, setIsGameFinished] = useState(false);
 
   let timerId = useRef(null);
   let timerIdReset = useRef(null);
@@ -45,8 +46,8 @@ function App() {
     if (cur) clearInterval(cur);
 
     setTimer(0);
-    setCardsCount(0);
     setIsOff(false);
+    setCardsCount(0);
     setIsStart(false);
     setPickedCards([]);
     timerIdReset.current = setTimeout(() => {
@@ -76,6 +77,7 @@ function App() {
 
         if (cardsCount === cards.length) {
           setIsGameFinished(true);
+          setIsOpen(true);
           clearInterval(timerId.current);
         }
       } else {
@@ -128,17 +130,17 @@ function App() {
 
   const result = useMemo(() => 1000 - timer * 10, [timer]);
 
+  const handleClose = useCallback(() => setIsOpen(false), []);
+
   return (
     <div className="app">
-      {IsGameFinished && (
-        <div className="win-modal">
-          <div className="win-block">
-            <h2>you win!</h2>
-            <p>Your score is: {result < 0 ? 0 : result}</p>
-          </div>
-        </div>
+      {isGameFinished && isOpen && (
+        <Modal
+          handleClose={handleClose}
+          result={result}
+          //  isOpen={isOpen}
+        />
       )}
-
       <ul className="cards">
         {shuffledCards.map((el) => (
           <Card
@@ -151,7 +153,6 @@ function App() {
           />
         ))}
       </ul>
-
       <div className="info">
         <Button onClick={handleStart}>start</Button>
         <Button onClick={handleStop} variant="secondary">

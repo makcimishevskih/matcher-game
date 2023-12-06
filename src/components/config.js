@@ -1,11 +1,11 @@
-import falcon from '../assets/falcon.png';
-import tiger from '../assets/tiger.png';
-import wolf from '../assets/wolf.png';
-import elephant from '../assets/elephant.png';
-import lion from '../assets/lion.png';
-import pinguine from '../assets/pinguine.png';
+import falcon from '../assets/cards-animals/falcon.png';
+import tiger from '../assets/cards-animals/tiger.png';
+import wolf from '../assets/cards-animals/wolf.png';
+import elephant from '../assets/cards-animals/elephant.png';
+import lion from '../assets/cards-animals/lion.png';
+import pinguine from '../assets/cards-animals/pinguine.png';
 
-const cards = [
+const animalCards = [
   { id: '1', img: falcon, label: 'falcon', isSuccess: false, isError: false },
   { id: '2', img: lion, label: 'lion', isSuccess: false, isError: false },
   {
@@ -44,4 +44,4 @@ const cards = [
   },
 ];
 
-export default cards;
+export default animalCards;
