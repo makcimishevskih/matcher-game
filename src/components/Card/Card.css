@@ -1,0 +1,62 @@
+.card {
+  width: 168px;
+  height: 168px;
+  cursor: pointer;
+  position: relative;
+}
+
+.card__front,
+.card__back {
+  width: 168px;
+  height: 168px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  position: absolute;
+  transition: transform 0.4s linear;
+}
+.card__back .success,
+.card__back .error {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+
+  width: 100%;
+  height: 100%;
+  animation: opacity 0.1s linear;
+}
+.success {
+  background-color: rgba(0, 128, 0, 0.5);
+}
+.error {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+@keyframes opacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.card__front img,
+.card__back img {
+  width: 100%;
+  height: 100%;
+}
+
+.card__front {
+  transform: perspective(600px) rotateY(0deg);
+}
+
+.card__back {
+  transform: perspective(600px) rotateY(180deg);
+}
+
+.card.active .card__front {
+  transform: perspective(600px) rotateY(-180deg);
+}
+.card.active .card__back {
+  transform: perspective(600px) rotateY(0deg);
+}

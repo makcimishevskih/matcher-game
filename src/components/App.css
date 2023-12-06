@@ -1,0 +1,24 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.cards {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, 168px);
+}
+
+.btn {
+  display: inline-block;
+  margin: 5px 10px;
+  cursor: pointer;
+  padding: 15px 30px;
+  outline: none;
+  border: none;
+  background-color: cyan;
+  border-radius: 8px;
+}
