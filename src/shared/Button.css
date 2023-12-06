@@ -8,13 +8,12 @@
   font-size: 18px;
   font-weight: 600;
   background-color: transparent;
-  color: white;
-  border: 2px solid cyan;
+  color: rgb(243, 241, 241);
+  border: 2px solid rgb(34, 233, 233);
 }
 
 .btn.primary {
-  color: black;
-  background-color: cyan;
+  background-color: rgb(34, 233, 233);
 }
 .btn.secondary {
   border: 2px solid lightcoral;

@@ -1,61 +1,31 @@
 import './App.css';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import useModal from '../hooks/useModal';
+import useTimer from '../hooks/useTimer.jsx';
 
 import cards from './config';
 import shuffle from '../helpers/shuffle';
 
-import Button from '../shared/Button';
 import Card from './Card';
 import Modal from './Modal';
+import Button from '../shared/Button';
 
 const shuffled = shuffle([...cards]);
 
 function App() {
-  const [timer, setTimer] = useState(0);
-  const [cardsCount, setCardsCount] = useState(0);
+  const { isOpen, handleClose, handleOpen } = useModal();
+  const { timer, timerId, handleStart, handleStop, handleTimerReset } =
+    useTimer();
 
   const [pickedCards, setPickedCards] = useState([]);
   const [shuffledCards, setShuffledCards] = useState([...shuffled]);
 
   const [isOff, setIsOff] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isStart, setIsStart] = useState(false);
+  const [cardsCount, setCardsCount] = useState(0);
   const [isGameFinished, setIsGameFinished] = useState(false);
 
-  let timerId = useRef(null);
   let timerIdReset = useRef(null);
-  let timerIdOff = useRef(null);
-
-  useEffect(() => {
-    if (isStart) {
-      timerId.current = setInterval(() => {
-        setTimer((prev) => (prev += 1));
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(timerId.current);
-      clearInterval(timerIdReset.current);
-      clearInterval(timerIdOff.current);
-    };
-  }, [isStart]);
-
-  const handleReset = useCallback(() => {
-    const cur = timerId.current;
-    if (cur) clearInterval(cur);
-
-    setTimer(0);
-    setIsOff(false);
-    setCardsCount(0);
-    setIsStart(false);
-    setPickedCards([]);
-    timerIdReset.current = setTimeout(() => {
-      setShuffledCards((prev) =>
-        shuffle(prev.map((el) => ({ ...el, isSuccess: false, isError: false })))
-      );
-    }, 500);
-  }, [timerId]);
 
   useEffect(() => {
     let innderTimerId;
@@ -77,7 +47,7 @@ function App() {
 
         if (cardsCount === cards.length) {
           setIsGameFinished(true);
-          setIsOpen(true);
+          handleOpen();
           clearInterval(timerId.current);
         }
       } else {
@@ -95,52 +65,56 @@ function App() {
             prevArr.map((el) => ({ ...el, isError: false }))
           );
 
-          setPickedCards((prev) => prev.slice(0, prev.length - 2));
           setCardsCount((prev) => (prev -= 2));
+          setPickedCards((prev) => prev.slice(0, prev.length - 2));
         }, 400);
       }
-      timerIdOff.current = setTimeout(() => {
-        setIsOff(false);
-      }, 410);
     }
 
-    return () => clearTimeout(innderTimerId);
+    setTimeout(() => setIsOff(false), 420);
+
+    return () => {
+      clearTimeout(innderTimerId);
+      clearInterval(timerIdReset.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardsCount]);
 
-  const handleStart = useCallback(() => {
-    setIsStart(true);
-  }, []);
+  const handleReset = useCallback(() => {
+    const cur = timerId.current;
+    if (cur) clearInterval(cur);
 
-  const handleStop = useCallback(() => {
-    setIsStart(false);
-    handleReset();
+    setIsOff(false);
+    setCardsCount(0);
+    setPickedCards([]);
+    handleStop();
+    handleTimerReset();
+
+    timerIdReset.current = setTimeout(() => {
+      setShuffledCards((prev) =>
+        shuffle(prev.map((el) => ({ ...el, isSuccess: false, isError: false })))
+      );
+    }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [timerId]);
 
   const handlePick = (id) => {
     if (isOff) return;
 
     const card = shuffledCards.find((el) => el.id === id);
-    if (pickedCards.find((el) => el.id === id)) return;
 
-    setPickedCards((prev) => prev.concat(card));
     setCardsCount((prev) => (prev += 1));
+    setPickedCards((prev) => prev.concat(card));
   };
 
   const result = useMemo(() => 1000 - timer * 10, [timer]);
 
-  const handleClose = useCallback(() => setIsOpen(false), []);
-
   return (
     <div className="app">
       {isGameFinished && isOpen && (
-        <Modal
-          handleClose={handleClose}
-          result={result}
-          //  isOpen={isOpen}
-        />
+        <Modal handleClose={handleClose} result={result} />
       )}
+
       <ul className="cards">
         {shuffledCards.map((el) => (
           <Card
@@ -154,11 +128,11 @@ function App() {
         ))}
       </ul>
       <div className="info">
-        <Button onClick={handleStart}>start</Button>
-        <Button onClick={handleStop} variant="secondary">
-          stop
+        <Button onClick={handleStart}>Start</Button>
+        <Button onClick={handleReset} variant="secondary">
+          Stop
         </Button>
-        <Button onClick={handleReset}>shuffle cards</Button>
+        <Button onClick={handleReset}>Shuffle cards</Button>
         <div>Timer: {timer} seconds</div>
         <div>Checked cards counter: {cardsCount}</div>
       </div>
