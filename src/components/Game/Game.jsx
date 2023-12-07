@@ -125,6 +125,7 @@ function Game({ arr }) {
   }, [timerId]);
 
   const handlePick = (id) => {
+    if (!isStart) return;
     if (isTouched || pickedCards.find((el) => el.id === id)) return;
 
     const card = shuffledCards.find((el) => el.id === id);

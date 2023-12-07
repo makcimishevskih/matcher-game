@@ -11,8 +11,6 @@ const useTimer = () => {
   useEffect(() => {
     if (isStart && !isStop) {
       timerId.current = setInterval(() => {
-        console.log(111);
-        console.log(333);
         setTimer((prev) => (prev += 1));
       }, 1000);
     } else {
