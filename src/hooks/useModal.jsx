@@ -13,7 +13,6 @@ const useModal = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      console.log(isOpen);
       if (e.code === 'Escape') {
         handleClose();
       }

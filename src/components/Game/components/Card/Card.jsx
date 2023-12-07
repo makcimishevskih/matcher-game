@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './Card.css';
-import cardTop from '../../assets/card-top.png';
+import cardTop from '../../../../assets/card-top.png';
 
 const Card = ({ img, handlePick, isActive, isSuccess, isError }) => {
   const cxCard = classNames('card', {
