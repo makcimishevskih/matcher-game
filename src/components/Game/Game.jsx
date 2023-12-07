@@ -5,7 +5,7 @@ import useModal from '../../hooks/useModal';
 import useTimer from '../../hooks/useTimer.jsx';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
-// import shuffle from '../../helpers/shuffle';
+import shuffle from '../../helpers/shuffle';
 
 import Card from './components/Card';
 import Modal from '../Modal';
@@ -15,9 +15,13 @@ Game.propTypes = {
   arr: PropTypes.array,
 };
 
+// USE IT
+// const timeToShow = 1500;
+
 function Game({ arr }) {
   const { isOpen, handleClose, handleOpen } = useModal();
   const {
+    isStart,
     timer,
     timerId,
     handleStart,
@@ -37,17 +41,14 @@ function Game({ arr }) {
   useEffect(() => {
     let timerId;
     if (isShowCard) {
-      // setIsTouched(true);
+      setIsTouched(true);
       setPickedCards(arr);
 
       timerId = setTimeout(() => {
         setPickedCards([]);
         setIsTouched(false);
         handleChangeIsShowCard(false);
-        // setShuffledCards((prev) =>
-        //   prev.map((el) => ({ ...el, isSuccess: false, isError: false }))
-        // );
-      }, 2000);
+      }, 1500);
     }
     return () => clearTimeout(timerId);
     // }
@@ -117,7 +118,7 @@ function Game({ arr }) {
 
     setTimeout(() => {
       setShuffledCards((prev) =>
-        prev.map((el) => ({ ...el, isSuccess: false, isError: false }))
+        shuffle(prev.map((el) => ({ ...el, isSuccess: false, isError: false })))
       );
     }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -152,7 +153,11 @@ function Game({ arr }) {
         ))}
       </ul>
       <div className="info">
-        <Button onClick={handleStart}>Start</Button>
+        {isStart ? (
+          <Button onClick={handleStart}>Pause</Button>
+        ) : (
+          <Button onClick={handleStart}>Start</Button>
+        )}
         <Button onClick={handleReset} variant="secondary">
           Stop
         </Button>

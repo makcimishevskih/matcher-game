@@ -1,34 +1,44 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const useTimer = () => {
-  const [isShowCard, setIsShowCard] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [isStop, setIsStop] = useState(false);
   const [isStart, setIsStart] = useState(false);
+  const [isShowCard, setIsShowCard] = useState(false);
 
   let timerId = useRef(null);
 
   useEffect(() => {
-    if (isStart) {
+    if (isStart && !isStop) {
       timerId.current = setInterval(() => {
+        console.log(111);
+        console.log(333);
         setTimer((prev) => (prev += 1));
       }, 1000);
+    } else {
+      setIsStart(false);
     }
 
-    return () => {
-      setIsShowCard(false);
-      clearInterval(timerId.current);
-    };
-  }, [isStart]);
+    return () => clearInterval(timerId.current);
+  }, [isStart, isStop]);
 
   const handleStart = useCallback(() => {
+    if (isStart && timerId.current) {
+      setIsStart(false);
+      clearInterval(timerId.current);
+      return;
+    }
+
+    setIsStop(false);
     setIsShowCard(true);
+
     setTimeout(() => {
       setIsStart(true);
-      setIsShowCard(false);
-    }, 2000);
-  }, []);
+    }, 1550);
+  }, [isStart]);
 
   const handleStop = useCallback(() => {
+    setIsStop(true);
     setIsShowCard(false);
     setIsStart(false);
   }, []);
@@ -42,12 +52,12 @@ const useTimer = () => {
   }, []);
 
   return {
+    isStart,
     timer,
     timerId,
     handleStart,
     handleStop,
     handleTimerReset,
-    //
     isShowCard,
     handleChangeIsShowCard,
   };
